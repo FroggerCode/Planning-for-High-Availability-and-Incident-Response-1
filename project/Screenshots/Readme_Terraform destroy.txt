@@ -1,0 +1,1 @@
+The instructions in the read me need to be evaluated. They do not outline the proper procedure for using Terraform destroy please reference https://knowledge.udacity.com/questions/793669
