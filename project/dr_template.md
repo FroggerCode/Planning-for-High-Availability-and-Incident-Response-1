@@ -6,16 +6,37 @@ Identify your zones here
 ## Servers and Clusters
 
 ### Table 1.1 Summary
-| Asset      | Purpose           | Size                                                                   | Qty                                                             | DR                                                                                                           |
-|------------|-------------------|------------------------------------------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| Asset name | Brief description | AWS size eg. t3.micro (if applicable, not all assets will have a size) | Number of nodes/replicas or just how many of a particular asset | Identify if this asset is deployed to DR, replicated, created in multiple locations or just stored elsewhere |
+| Asset         | Purpose                                       			| Size       | Qty      | DR                            |        
+|---------------|-------------------------------------------------------------|------------|----------|-------------------------------|
+| EC2 Instance1 | App server in the primary region us-east-2 			| t3.micro   | 3        | Deployed in us-east-2		 |
+| EC2 Instance2 | App server in secondary region us-west-1	 			| t3.micro   | 3        | Deployed in us-west for DR	 |
+| EKS Cluster1  | Kubernetes monitoring cluster for us-east-2			| t3.medium  | 2 nodes  | Replicated in us-west-1	 |
+| EKS Cluster2  | Kubernetes monitoring cluster for us-west-1			| t3.medium  | 2 nodes  | Deployed in us-west-1 for DR  |
+| VPC		    | Logically isolated virtual network with IPs in av zones	|			     | Deployed in us-east-2         |
+| VPC		    | Logically isolated virtual network with IPs in av zones	|			     | Deployed in us-west-1 for DR  |
+| Load Balancer | Distribute traffic between the 3 EC2 instance in us-east-2  |                      | Deployed in us-east-2         |                        
+| Load Balancer | Distribute traffic between the 3 EC2 instance in us-west-1  |                      | Deployed in us-west-1         |
+| RDS Cluster1  | Primary database in us-east-2						| db.t2.small| 2 nodes | Deployed in us-east-2		 |
+| RDS Cluster2  | Secondary database for georeplication in us-west-1		| db.t2.small| 2 nodes | Replicated in us-west-1 for DR|
 
 ### Descriptions
-More detailed descriptions of each asset identified above.
+EC2 Instances - Virtual machines that handle run the applications.
+EKS Cluster   - Nodes that are setup to monitor the EC2 instances using prometheus grafana to create dashboards and metrics.
+VPC 		  - Virtual Private Cloud that allows AWS users to define logically isolated network to deploy in specific regions/zones for high availability.
+Load Balancer - Distributes traffic dynamically between all EC2 app instances to prevent stress/high load.
+RDS Cluster   - database that are highly available in two separate regions for georeplication.
 
 ## DR Plan
 ### Pre-Steps:
-List steps you would perform to setup the infrastructure in the other region. It doesn't have to be super detailed, but high-level should suffice.
+Verify all resources are available in both regions.
+Check the load balancer configs
+Verify the us-west-1 cluster is up to date and has been replicated
+
+
 
 ## Steps:
-You won't actually perform these steps, but write out what you would do to "fail-over" your application and database cluster to the other region. Think about all the pieces that were setup and how you would use those in the other region
+During a DR scenario that affects the primary region us-east-2 services would need to be switched over to the secondary region to achieve quick recovery.
+1. Load Balancers to point to DR site
+2. Database cluster will be swapped us-east-2 becomes the secondary us-west-1 becomes the primary
+3. Validate the backup EC2 instance is pointed at the the new primary DB cluster in us-west-1.
+4. Check Grafana to ensure traffic is moving in the US-west-1 region.
