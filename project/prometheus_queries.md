@@ -17,7 +17,7 @@ sum(rate(apiserver_request_duration_seconds_bucket{job="apiserver"}[5m])) by (le
 sum(rate(apiserver_request_total{job="apiserver",code=~"2.."}[1h]))
 
 ## Error Budget - Remaining Error Budget
-### The error budget is 10%
+### The error budget is 20%
 
-1 - ((1 - (sum(increase(apiserver_request_total{job="apiserver", code="200"}[7d])) by (verb)) / sum(increase(apiserver_request_total{job="apiserver"}[7d])) by (verb)) / (1 - .90))
+1 - ((1 - (sum(increase(apiserver_request_total{job="apiserver", code="200"}[7d])) by (verb)) / sum(increase(apiserver_request_total{job="apiserver"}[7d])) by (verb)) / (1 - .80))
 
